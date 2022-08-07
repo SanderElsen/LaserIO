@@ -25,6 +25,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.Item;
@@ -2101,6 +2102,10 @@ public class LaserNodeBE extends BaseLaserBE {
         Arrays.stream(nodeSideCaches).forEach(e -> e.laserEnergyStorage.invalidate());
     }
 
+    public TranslatableComponent getNeighbor(Direction direction){
+        return (TranslatableComponent)level.getBlockState(getBlockPos().relative(direction)).getBlock().getName();
+    }
+    
     public class LaserEnergyStorage implements IEnergyStorage {
         private final Direction facing;
 

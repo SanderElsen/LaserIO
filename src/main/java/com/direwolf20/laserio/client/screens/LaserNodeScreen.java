@@ -1,5 +1,4 @@
 package com.direwolf20.laserio.client.screens;
-
 import com.direwolf20.laserio.common.LaserIO;
 import com.direwolf20.laserio.common.containers.CardHolderContainer;
 import com.direwolf20.laserio.common.containers.LaserNodeContainer;
@@ -17,6 +16,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -83,7 +83,9 @@ public class LaserNodeScreen extends AbstractContainerScreen<LaserNodeContainer>
         fill(matrixStack, tabs[container.side].x, tabs[container.side].y + 11, tabs[container.side].x + 2, tabs[container.side].y + 12, 0xFFFFFFFF);
         fill(matrixStack, tabs[container.side].x + 22, tabs[container.side].y + 11, tabs[container.side].x + 24, tabs[container.side].y + 12, 0xFFFFFFFF);
         matrixStack.pushPose();
-        font.draw(matrixStack, sides[container.side].getString(), imageWidth / 2 - font.width(sides[container.side].getString()) / 2, 20, Color.DARK_GRAY.getRGB());
+
+        String neighborName = container.tile.getNeighbor(Direction.values()[container.side]).getString();
+        font.draw(matrixStack, neighborName, imageWidth / 2 - font.width(neighborName) / 2, 20, Color.DARK_GRAY.getRGB());
         font.draw(matrixStack, "U", 15, 7, Color.DARK_GRAY.getRGB());
         font.draw(matrixStack, "D", 43, 7, Color.DARK_GRAY.getRGB());
         font.draw(matrixStack, "N", 71, 7, Color.DARK_GRAY.getRGB());
