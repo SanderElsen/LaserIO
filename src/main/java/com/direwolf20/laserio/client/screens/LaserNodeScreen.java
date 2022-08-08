@@ -22,7 +22,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 import java.awt.*;
@@ -52,7 +51,7 @@ public class LaserNodeScreen extends AbstractContainerScreen<LaserNodeContainer>
     public LaserNodeScreen(LaserNodeContainer container, Inventory inv, Component name) {
         super(container, inv, name);
         this.container = container;
-        this.imageHeight = 181;
+        this.imageHeight = 200;
         showCardHolderUI = container.cardHolder.isEmpty();
         //this.imageWidth = 202;
     }
@@ -79,13 +78,13 @@ public class LaserNodeScreen extends AbstractContainerScreen<LaserNodeContainer>
 
     @Override
     protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY) {
-        fill(matrixStack, tabs[container.side].x + 2, tabs[container.side].y + 2, tabs[container.side].x + 22, tabs[container.side].y + 14, 0xFFC6C6C6);
-        fill(matrixStack, tabs[container.side].x, tabs[container.side].y + 11, tabs[container.side].x + 2, tabs[container.side].y + 12, 0xFFFFFFFF);
-        fill(matrixStack, tabs[container.side].x + 22, tabs[container.side].y + 11, tabs[container.side].x + 24, tabs[container.side].y + 12, 0xFFFFFFFF);
+        fill(matrixStack, tabs[container.side].x + 2, tabs[container.side].y + 2+27, tabs[container.side].x + 22, tabs[container.side].y + 5+27, 0xFFC6C6C6);
+        fill(matrixStack, tabs[container.side].x, tabs[container.side].y + 11+18, tabs[container.side].x + 2, tabs[container.side].y + 12+18, 0xFFFFFFFF);
+        fill(matrixStack, tabs[container.side].x + 22, tabs[container.side].y + 11+18, tabs[container.side].x + 24, tabs[container.side].y + 12+18, 0xFFFFFFFF);
         matrixStack.pushPose();
-
-        String neighborName = container.tile.getNeighbor(Direction.values()[container.side]).getString();
-        font.draw(matrixStack, neighborName, imageWidth / 2 - font.width(neighborName) / 2, 20, Color.DARK_GRAY.getRGB());
+        
+        //font.draw(matrixStack, neighborBlock.getBlock().getName().getString(), imageWidth / 2 - font.width(neighborBlock.getBlock().getName().getString()) / 2, 20, Color.DARK_GRAY.getRGB());
+        font.draw(matrixStack, sides[container.side].getString(), imageWidth / 2 - font.width(sides[container.side].getString()) / 2, 20+18, Color.DARK_GRAY.getRGB());
         font.draw(matrixStack, "U", 15, 7, Color.DARK_GRAY.getRGB());
         font.draw(matrixStack, "D", 43, 7, Color.DARK_GRAY.getRGB());
         font.draw(matrixStack, "N", 71, 7, Color.DARK_GRAY.getRGB());
@@ -104,8 +103,15 @@ public class LaserNodeScreen extends AbstractContainerScreen<LaserNodeContainer>
         if (showCardHolderUI) {
             ResourceLocation CardHolderGUI = new ResourceLocation(LaserIO.MODID, "textures/gui/cardholder_node.png");
             RenderSystem.setShaderTexture(0, CardHolderGUI);
-            this.blit(matrixStack, getGuiLeft() - 50, getGuiTop() + 24, 0, 0, this.imageWidth, this.imageHeight);
+            this.blit(matrixStack, getGuiLeft() - 50, getGuiTop() + 24+18, 0, 0, this.imageWidth, this.imageHeight);
         }
+        
+        container.slots.get(10).set(new ItemStack(container.tile.getNeighbor(Direction.UP).getBlock()));
+        container.slots.get(11).set(new ItemStack(container.tile.getNeighbor(Direction.DOWN).getBlock()));
+        container.slots.get(12).set(new ItemStack(container.tile.getNeighbor(Direction.NORTH).getBlock()));
+        container.slots.get(13).set(new ItemStack(container.tile.getNeighbor(Direction.SOUTH).getBlock()));
+        container.slots.get(14).set(new ItemStack(container.tile.getNeighbor(Direction.WEST).getBlock()));
+        container.slots.get(15).set(new ItemStack(container.tile.getNeighbor(Direction.EAST).getBlock()));
     }
 
     public boolean validateHolder() {
@@ -126,42 +132,39 @@ public class LaserNodeScreen extends AbstractContainerScreen<LaserNodeContainer>
     }
 
     public void toggleHolderSlots() {
-        for (int i = 10; i < 10 + CardHolderContainer.SLOTS; i++) {
-            if (i >= container.slots.size()) continue;
-            Slot slot = container.getSlot(i);
-            if (!(slot instanceof CardHolderSlot)) continue;
-            ((CardHolderSlot) slot).setEnabled(showCardHolderUI);
-        }
+        container.slots.stream()
+                    .filter(slot -> slot instanceof CardHolderSlot)
+                    .forEach(slot -> ((CardHolderSlot) slot).setEnabled(showCardHolderUI));;
     }
 
     @Override
     public boolean mouseClicked(double x, double y, int btn) {
-        if (MiscTools.inBounds(getGuiLeft() + tabs[1].x, getGuiTop() + tabs[1].y, 24, 12, x, y) && container.side != 1) {
+        if (MiscTools.inBounds(getGuiLeft() + tabs[1].x, getGuiTop() + tabs[1].y, 24, 12+18, x, y) && container.side != 1) {
             PacketHandler.sendToServer(new PacketOpenNode(container.tile.getBlockPos(), (byte) 1));
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             return true;
         }
-        if (MiscTools.inBounds(getGuiLeft() + tabs[0].x, getGuiTop() + tabs[0].y, 24, 12, x, y) && container.side != 0) {
+        if (MiscTools.inBounds(getGuiLeft() + tabs[0].x, getGuiTop() + tabs[0].y, 24, 12+18, x, y) && container.side != 0) {
             PacketHandler.sendToServer(new PacketOpenNode(container.tile.getBlockPos(), (byte) 0));
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             return true;
         }
-        if (MiscTools.inBounds(getGuiLeft() + tabs[2].x, getGuiTop() + tabs[2].y, 24, 12, x, y) && container.side != 2) {
+        if (MiscTools.inBounds(getGuiLeft() + tabs[2].x, getGuiTop() + tabs[2].y, 24, 12+18, x, y) && container.side != 2) {
             PacketHandler.sendToServer(new PacketOpenNode(container.tile.getBlockPos(), (byte) 2));
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             return true;
         }
-        if (MiscTools.inBounds(getGuiLeft() + tabs[3].x, getGuiTop() + tabs[3].y, 24, 12, x, y) && container.side != 3) {
+        if (MiscTools.inBounds(getGuiLeft() + tabs[3].x, getGuiTop() + tabs[3].y, 24, 12+18, x, y) && container.side != 3) {
             PacketHandler.sendToServer(new PacketOpenNode(container.tile.getBlockPos(), (byte) 3));
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             return true;
         }
-        if (MiscTools.inBounds(getGuiLeft() + tabs[4].x, getGuiTop() + tabs[4].y, 24, 12, x, y) && container.side != 4) {
+        if (MiscTools.inBounds(getGuiLeft() + tabs[4].x, getGuiTop() + tabs[4].y, 24, 12+18, x, y) && container.side != 4) {
             PacketHandler.sendToServer(new PacketOpenNode(container.tile.getBlockPos(), (byte) 4));
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             return true;
         }
-        if (MiscTools.inBounds(getGuiLeft() + tabs[5].x, getGuiTop() + tabs[5].y, 24, 12, x, y) && container.side != 5) {
+        if (MiscTools.inBounds(getGuiLeft() + tabs[5].x, getGuiTop() + tabs[5].y, 24, 12+18, x, y) && container.side != 5) {
             PacketHandler.sendToServer(new PacketOpenNode(container.tile.getBlockPos(), (byte) 5));
             Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1.0F));
             return true;

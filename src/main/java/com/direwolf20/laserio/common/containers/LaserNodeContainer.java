@@ -4,6 +4,7 @@ import com.direwolf20.laserio.common.blockentities.LaserNodeBE;
 import com.direwolf20.laserio.common.containers.customhandler.LaserNodeItemHandler;
 import com.direwolf20.laserio.common.containers.customslot.CardHolderSlot;
 import com.direwolf20.laserio.common.containers.customslot.LaserNodeSlot;
+import com.direwolf20.laserio.common.containers.customslot.NeighborSlot;
 import com.direwolf20.laserio.common.items.CardHolder;
 import com.direwolf20.laserio.common.items.cards.BaseCard;
 import com.direwolf20.laserio.common.items.upgrades.OverclockerNode;
@@ -52,16 +53,20 @@ public class LaserNodeContainer extends AbstractContainerMenu {
         this.playerInventory = new InvWrapper(playerInventory);
         this.containerLevelAccess = containerLevelAccess;
         if (handler != null) {
-            addSlotBox(handler, 0, 62, 32, 3, 18, 3, 18);
-            addSlotRange(handler, 9, 152, 78, 1, 18);
+            addSlotBox(handler, 0, 62, 32+18, 3, 18, 3, 18);
+            addSlotRange(handler, 9, 152, 78+18, 1, 18);
+            for(int i = 0;i<=6;i++){
+                addSlot(new NeighborSlot(handler,10+i,10+i*28,16));
+            }
+            
         }
         this.cardHolder = cardHolder;
         //if (!cardHolder.equals(ItemStack.EMPTY)) {
             this.cardHolderHandler = cardHolder.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).orElse(new ItemStackHandler(CardHolderContainer.SLOTS));
-            addSlotBox(cardHolderHandler, 0, -42, 32, 5, 18, 3, 18);
+            addSlotBox(cardHolderHandler, 0, -42, 32+18, 5, 18, 3, 18);
             cardHolderUUID = CardHolder.getUUID(cardHolder);
         //}
-        layoutPlayerInventorySlots(8, 99);
+        layoutPlayerInventorySlots(8, 99+18);
     }
 
     @Override
